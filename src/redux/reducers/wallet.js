@@ -1,15 +1,23 @@
-import { WALLET } from '../actions';
+import { ADD_EXPENSES, SELECT_CURRENCIES } from '../actions';
 
-const initialState = {
-  email: '',
+const INITIAL_STATE = {
+  currencies: [],
+  expenses: [],
 };
 
-function walletReducer(state = initialState, action) {
+function walletReducer(state = INITIAL_STATE, action) {
   switch (action.type) {
-  case WALLET:
-    return action.value;
-  default:
-    return state;
+  case SELECT_CURRENCIES:
+    return {
+      ...state,
+      currencies: action.payload,
+    };
+  case ADD_EXPENSES:
+    return {
+      ...state,
+      expenses: [...state.expenses, action.payload],
+    };
+  default: return state;
   }
 }
 

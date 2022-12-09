@@ -1,16 +1,16 @@
-import { LOGIN } from '../actions';
+import { ADD_USER } from '../actions';
 
-const initialState = {
+const INITIAL_STATE = {
   email: '',
 };
 
-function loginReducer(state = initialState, action) {
+function userReducer(state = INITIAL_STATE, action) {
   switch (action.type) {
-  case LOGIN:
-    return action.value;
+  case ADD_USER:
+    return action.payload;
   default:
     return state;
   }
 }
 
-export default loginReducer;
+export default userReducer;

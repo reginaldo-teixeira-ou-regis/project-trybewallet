@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { login as loginAction } from '../redux/actions';
+import { addUser } from '../redux/actions';
 
 class Login extends React.Component {
   constructor(props) {
@@ -18,7 +18,6 @@ class Login extends React.Component {
     return (
       <div className="Login">
         <h3 className="text-center">Login</h3>
-        <section className="login-inputs" />
         <form className="formLogin">
           <label htmlFor="email">
             <input
@@ -27,7 +26,7 @@ class Login extends React.Component {
               name="email"
               id="email"
               data-testid="email-input"
-              onChange={ (e) => this.setState({ email: e.target.value }) }
+              onChange={ ({ target }) => this.setState({ email: target.value }) }
             />
           </label>
           <label htmlFor="password">
@@ -37,12 +36,12 @@ class Login extends React.Component {
               name="password"
               id="password"
               data-testid="password-input"
-              onChange={ (e) => this.setState({ password: e.target.value }) }
+              onChange={ ({ target }) => this.setState({ password: target.value }) }
             />
           </label>
           <button
             type="button"
-            onClick={ () => dispatch(loginAction({ email, password }))
+            onClick={ () => dispatch(addUser({ email, password }))
               && history.push('/carteira') }
             disabled={ password.length < +'6' || !email.match(
               /^((?!\.)[\w\-_.]*[^.])(@\w+)(\.\w+(\.\w+)?[^.\W])$/gm,
