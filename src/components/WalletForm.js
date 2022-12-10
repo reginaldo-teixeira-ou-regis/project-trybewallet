@@ -119,11 +119,6 @@ class WalletForm extends Component {
               <option value="Saúde">Saúde</option>
             </select>
           </label>
-          <button
-            type="submit"
-          >
-            Adicionar despesa
-          </button>
           <label htmlFor="description">
             <span>Descrição: </span>
             <input
@@ -135,6 +130,11 @@ class WalletForm extends Component {
               onChange={ this.handleChange }
             />
           </label>
+          <button
+            type="submit"
+          >
+            Adicionar despesa
+          </button>
         </form>
       </div>
     );
