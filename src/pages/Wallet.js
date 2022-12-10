@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import Header from '../components/Header';
 import WalletForm from '../components/WalletForm';
-import currApi from '../services/fetchCurrency';
+import currApi from '../services/fetchCurrencies';
 import { selectCurrencies } from '../redux/actions';
 
 class Wallet extends React.Component {
@@ -12,20 +12,20 @@ class Wallet extends React.Component {
   };
 
   componentDidMount() {
-    this.getCurrencies();
+    this.getCoins();
   }
 
-  saveCoinsGlobalState = () => {
+  setCoinsGlobalState = () => {
     const { dispatch } = this.props;
     const { currencies } = this.state;
     dispatch(selectCurrencies(currencies));
   };
 
-  getCurrencies = async () => {
+  getCoins = async () => {
     const currencies = await currApi.fetchCurrencies();
     this.setState({
       currencies,
-    }, this.saveCoinsGlobalState);
+    }, this.setCoinsGlobalState);
   };
 
   render() {
@@ -39,9 +39,9 @@ class Wallet extends React.Component {
   }
 }
 
-const mapStateToProps = (state) => ({
-  ...state.user,
-  ...state.wallet,
+const mapStateToProps = (stateGlobal) => ({
+  ...stateGlobal.user,
+  ...stateGlobal.wallet,
 });
 
 Wallet.propTypes = {

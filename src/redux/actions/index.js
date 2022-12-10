@@ -16,3 +16,10 @@ export const addExpenses = (expenses) => ({
   type: ADD_EXPENSES,
   payload: expenses,
 });
+
+export const saveExpenseForm = (infos) => async (dispatch) => {
+  const fetchCurr = await fetch('https://economia.awesomeapi.com.br/json/all');
+  const currenciesJson = await fetchCurr.json();
+  delete currenciesJson.USDT;
+  dispatch(addExpenses({ ...infos, exchangeRates: currenciesJson }));
+};

@@ -1,16 +1,15 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import currApi from '../services/fetchCurrency';
-import { addExpenses } from '../redux/actions';
+import { saveExpenseForm } from '../redux/actions';
 
 class WalletForm extends Component {
   state = {
     value: '',
     description: '',
     currency: 'USD',
-    paymentMethod: 'Dinheiro',
-    category: 'Alimentação',
+    method: 'Dinheiro',
+    tag: 'Alimentação',
   };
 
   handleChange = ({ target }) => {
@@ -24,27 +23,25 @@ class WalletForm extends Component {
       value: '',
       description: '',
       currency: 'USD',
-      paymentMethod: 'Dinheiro',
-      category: 'Alimentação',
+      method: 'Dinheiro',
+      tag: 'Alimentação',
     });
   };
 
-  handleSubmit = async ({ target }) => {
-    target.preventDefault();
+  handleSubmit = async (event) => {
+    event.preventDefault();
     const { dispatch, expenses } = this.props;
-    const { value, description, currency, paymentMethod, category } = this.state;
+    const { value, description, currency, method, tag } = this.state;
 
-    const currs = await currApi.fetchRates();
     const expense = {
       id: expenses.length,
       value,
       description,
       currency,
-      paymentMethod,
-      category,
-      exchangeRates: currs,
+      method,
+      tag,
     };
-    dispatch(addExpenses(expense));
+    dispatch(saveExpenseForm(expense));
     this.clearFields();
   };
 
@@ -53,8 +50,8 @@ class WalletForm extends Component {
       value,
       description,
       currency,
-      paymentMethod,
-      category,
+      method,
+      tag,
     } = this.state;
     const { currencies } = this.props;
     return (
@@ -92,13 +89,13 @@ class WalletForm extends Component {
               }
             </select>
           </label>
-          <label htmlFor="paymentMethod">
+          <label htmlFor="method">
             <span>Método de pagamento: </span>
             <select
-              name="paymentMethod"
-              id="paymentMethod"
+              name="method"
+              id="method"
               data-testid="method-input"
-              value={ paymentMethod }
+              value={ method }
               onChange={ this.handleChange }
             >
               <option defaultValue="Dinheiro">Dinheiro</option>
@@ -106,13 +103,13 @@ class WalletForm extends Component {
               <option value="Cartão de débito">Cartão de débito</option>
             </select>
           </label>
-          <label htmlFor="category">
+          <label htmlFor="tag">
             <span>Categoria: </span>
             <select
-              name="category"
-              id="category"
+              name="tag"
+              id="tag"
               data-testid="tag-input"
-              value={ category }
+              value={ tag }
               onChange={ this.handleChange }
             >
               <option defaultValue="Alimentação">Alimentação</option>
@@ -122,6 +119,11 @@ class WalletForm extends Component {
               <option value="Saúde">Saúde</option>
             </select>
           </label>
+          <button
+            type="submit"
+          >
+            Adicionar despesa
+          </button>
           <label htmlFor="description">
             <span>Descrição: </span>
             <input
@@ -133,11 +135,6 @@ class WalletForm extends Component {
               onChange={ this.handleChange }
             />
           </label>
-          <button
-            type="submit"
-          >
-            Adicionar despesa
-          </button>
         </form>
       </div>
     );
@@ -151,7 +148,8 @@ WalletForm.propTypes = {
 };
 
 const mapStateToProps = (stateGlobal) => ({
-  ...stateGlobal.wallet,
+  currencies: stateGlobal.wallet.currencies,
+  expenses: stateGlobal.wallet.expenses,
 });
 
 export default connect(mapStateToProps)(WalletForm);

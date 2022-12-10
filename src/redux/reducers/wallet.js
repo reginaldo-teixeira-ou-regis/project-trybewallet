@@ -3,6 +3,8 @@ import { ADD_EXPENSES, SELECT_CURRENCIES } from '../actions';
 const INITIAL_STATE = {
   currencies: [],
   expenses: [],
+  editor: false,
+  idToEdit: 0,
 };
 
 function walletReducer(state = INITIAL_STATE, action) {
