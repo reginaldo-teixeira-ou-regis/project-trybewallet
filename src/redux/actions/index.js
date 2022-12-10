@@ -19,9 +19,9 @@ export const addExpenses = (expenses) => ({
   payload: expenses,
 });
 
-export const deleteExpense = (expenses) => ({
+export const deleteExpense = (id) => ({
   type: DELETE_EXPENSE,
-  payload: expenses,
+  payload: id,
 });
 
 /* export const editExpense = (expense) => ({

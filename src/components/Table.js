@@ -4,9 +4,9 @@ import { connect } from 'react-redux';
 import { deleteExpense } from '../redux/actions';
 
 class Table extends Component {
-  deleteExpense = (id) => {
+  deleteExpense = (idExpense) => {
     const { expenses, dispatch } = this.props;
-    const expensesList = expenses.filter((expense) => expense.id !== id);
+    const expensesList = expenses.filter(({ id }) => id !== idExpense);
     dispatch(deleteExpense(expensesList));
   };
 
