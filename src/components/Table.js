@@ -23,19 +23,27 @@ class Table extends Component {
           </thead>
           <tbody>
             {
-              expenses.map((expense) => (
-                <tr key={ expense.id }>
-                  <td>{expense.description}</td>
-                  <td>{expense.tag}</td>
-                  <td>{expense.method}</td>
-                  <td>{Number(expense.value).toFixed(2)}</td>
-                  <td>{expense.exchangeRates[expense.currency].name}</td>
+              expenses.map(({
+                id,
+                description,
+                tag,
+                method,
+                value,
+                exchangeRates,
+                currency,
+              }) => (
+                <tr key={ id }>
+                  <td>{description}</td>
+                  <td>{tag}</td>
+                  <td>{method}</td>
+                  <td>{Number(value).toFixed(2)}</td>
+                  <td>{exchangeRates[currency].name}</td>
                   <td>
-                    {Number(expense.exchangeRates[expense.currency].ask).toFixed(2)}
+                    {Number(exchangeRates[currency].ask).toFixed(2)}
                   </td>
                   <td>
-                    {Number((expense.exchangeRates[expense.currency].ask)
-                     * expense.value).toFixed(2)}
+                    {Number((exchangeRates[currency].ask)
+                     * value).toFixed(2)}
                   </td>
                   <td>Real</td>
                 </tr>
