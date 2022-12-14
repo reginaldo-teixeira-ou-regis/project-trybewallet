@@ -4,6 +4,41 @@ import userEvent from '@testing-library/user-event';
 import App from '../../App';
 import { renderWithRouterAndRedux } from './renderWith';
 import mockData from './mockData';
+import { selectCurrencies, addExpenses, deleteExpense, editExpense, saveExpense } from '../../redux/actions';
+import rootReducer from '../../redux/reducers';
+
+const firstExpense = {
+  id: 0,
+  value: '15',
+  currency: 'USD',
+  method: 'Cartão de débito',
+  tag: 'Lazer',
+  description: 'Shopping',
+  exchangeRates: mockData,
+};
+
+const secondExpense = {
+  id: 1,
+  value: '10',
+  currency: 'EUR',
+  method: 'Dinheiro',
+  tag: 'Trabalho',
+  description: 'Metro',
+  exchangeRates: mockData,
+};
+
+const INITIAL_STATE = {
+  user: {
+    email: '',
+    password: '',
+  },
+  wallet: {
+    expensesTotal: '0',
+    expenses: [firstExpense],
+    editor: false,
+    idToEdit: 0,
+    currencies: Object.keys(mockData),
+  } };
 
 const emailUser = 'reginaldoteixeira@gmail.com';
 const passwordUser = '1r2e3g';
@@ -160,7 +195,7 @@ describe('Verify if the WalletForm component is rendered correctly', () => {
     expect(inputTag).toHaveTextContent('Alimentação');
   });
 
-  it('Verify that a button with the text "Add Expense" render.', async () => {
+  it('Verify if the actions of "Add Expenses", "Delete Expenses", "Edit Expenses" and "Save Expenses" are correctly rendered.', async () => {
     jest.spyOn(global, 'fetch');
     global.fetch.mockResolvedValue({
       json: jest.fn().mockResolvedValue(mockData),
@@ -182,33 +217,92 @@ describe('Verify if the WalletForm component is rendered correctly', () => {
     expect(inputDescription).toBeInTheDocument();
     expect(btnAddExpense).toBeInTheDocument();
 
-    userEvent.type(inputValue, 11);
+    userEvent.type(inputValue, '11');
     userEvent.type(inputCurrency, 'USD');
     userEvent.type(inputMethodPayment, 'Dinheiro');
     userEvent.type(inputTag, 'Alimentação');
-    userEvent.type(inputDescription, 'onze');
+    userEvent.type(inputDescription, 'Shopping');
     userEvent.click(btnAddExpense);
 
-    const descriptionTable = screen.findByRole('columnheader', { name: /descrição/i });
+    const descriptionTable = screen.findByRole('columnheader', { name: 'Descrição' });
     const tagTable = screen.findByRole('columnheader', { name: /tag/i });
     const methodPaymentTable = screen.findByRole('columnheader', { name: /método de pagamento/i });
-    const valueTable = screen.findByRole('columnheader', { name: /valor/i });
-    const currencyTable = screen.findByRole('columnheader', { name: /moeda/i });
+    const valueTable = screen.getByRole('columnheader', { name: 'Valor' });
+    const currencyTable = screen.findByRole('columnheader', { name: 'Moeda' });
     const exchangeUsedTable = await screen.findByRole('columnheader', { name: /câmbio utilizado/i });
     const convertedValueTable = await screen.findByRole('columnheader', { name: /Valor convertido/i });
     const conversionCurrencyTable = screen.findByRole('columnheader', { name: /Moeda de conversão/i });
-    const btnDelete = screen.findByRole('button', { name: /deletar/i });
-    const btnEdit = await screen.findByRole('button', { name: /editar/i });
+    const btnDelete = await screen.findByRole('button', { name: /excluir/i });
 
-    expect(descriptionTable).toBeInTheDocument();
-    expect(tagTable).toBeInTheDocument();
-    expect(methodPaymentTable).toBeInTheDocument();
-    expect(valueTable).toBeInTheDocument();
-    expect(currencyTable).toBeInTheDocument();
-    expect(exchangeUsedTable).toBeInTheDocument();
-    expect(convertedValueTable).toBeInTheDocument();
-    expect(conversionCurrencyTable).toBeInTheDocument();
-    expect(btnDelete).toBeInTheDocument();
-    expect(btnEdit).toBeInTheDocument();
+    expect(global.fetch).toHaveBeenCalledWith('https://economia.awesomeapi.com.br/json/all');
+    expect(descriptionTable).toBeDefined();
+    expect(tagTable).toBeDefined();
+    expect(methodPaymentTable).toBeDefined();
+    expect(valueTable).toBeDefined();
+    expect(currencyTable).toBeDefined();
+    expect(exchangeUsedTable).toBeDefined();
+    expect(convertedValueTable).toBeDefined();
+    expect(conversionCurrencyTable).toBeDefined();
+
+    userEvent.type(inputValue, '15');
+    userEvent.type(inputCurrency, 'USD');
+    userEvent.type(inputMethodPayment, 'Dinheiro');
+    userEvent.type(inputTag, 'Transporte');
+    userEvent.type(inputDescription, 'Metro');
+    userEvent.click(btnAddExpense);
+    const btnEdit = await screen.findByRole('button', { name: /editar/i });
+    userEvent.click(btnEdit);
+    const btnSaveEdit = await screen.findByRole('button', { name: /editar despesa/i });
+
+    userEvent.type(inputValue, '10');
+    userEvent.selectOptions(inputCurrency, 'EUR');
+    userEvent.selectOptions(inputMethodPayment, 'Cartão de crédito');
+    userEvent.selectOptions(inputTag, 'Transporte');
+    userEvent.type(inputDescription, 'Trem');
+    userEvent.click(btnSaveEdit);
+
+    expect(await screen.findByRole('cell', { name: '10.00' })).toBeInTheDocument();
+    expect(await screen.findByRole('cell', { name: 'Euro/Real Brasileiro' })).toBeInTheDocument();
+    expect(await screen.findByRole('cell', { name: 'Cartão de crédito' })).toBeInTheDocument();
+    expect(await screen.findByRole('cell', { name: 'Transporte' })).toBeInTheDocument();
+    expect(await screen.findByRole('cell', { name: 'Trem' })).toBeInTheDocument();
+
+    expect(btnDelete).toBeDefined();
+    expect(btnEdit).toBeDefined();
+
+    userEvent.click(btnDelete);
+
+    expect(btnDelete).not.toBeInTheDocument();
+    expect(btnEdit).not.toBeInTheDocument();
+  });
+});
+
+describe('Tests wallet reducer', () => {
+  it('currency action ', () => {
+    const currencies = Object.keys(mockData).filter((coin) => coin !== 'USDT');
+    const state = rootReducer(INITIAL_STATE, selectCurrencies(currencies));
+    expect(state.wallet.currencies).toEqual(currencies);
+  });
+
+  it('add expense action', () => {
+    const state = rootReducer(INITIAL_STATE, addExpenses(secondExpense));
+    expect(state.wallet.expenses).toEqual([firstExpense, secondExpense]);
+  });
+
+  it('delete action', () => {
+    const state = rootReducer(INITIAL_STATE, deleteExpense(0));
+    expect(state.wallet.expenses).toEqual(0);
+  });
+
+  it('edit action', () => {
+    const state = rootReducer(INITIAL_STATE, editExpense(0));
+    expect(state.wallet.idToEdit).toEqual(0);
+    expect(state.wallet.editor).toBeTruthy();
+  });
+
+  it('saved action', () => {
+    const state = rootReducer(INITIAL_STATE, saveExpense(0));
+    expect(state.wallet.idToEdit).toEqual(0);
+    expect(state.wallet.editor).toBeFalsy();
   });
 });
