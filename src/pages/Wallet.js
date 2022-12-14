@@ -8,10 +8,6 @@ import currApi from '../services/fetchCurrencies';
 import { selectCurrencies } from '../redux/actions';
 
 class Wallet extends React.Component {
-  state = {
-    currencies: [],
-  };
-
   componentDidMount() {
     this.getCoins();
   }
