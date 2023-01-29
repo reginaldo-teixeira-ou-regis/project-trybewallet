@@ -235,6 +235,7 @@ describe('Verify if the WalletForm component is rendered correctly', () => {
     const btnDelete = await screen.findByRole('button', { name: /excluir/i });
 
     expect(global.fetch).toHaveBeenCalledWith('https://economia.awesomeapi.com.br/json/all');
+    expect(global.fetch).toHaveBeenCalledTimes(2);
     expect(descriptionTable).toBeDefined();
     expect(tagTable).toBeDefined();
     expect(methodPaymentTable).toBeDefined();
